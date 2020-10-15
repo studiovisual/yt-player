@@ -1,5 +1,5 @@
 const EventEmitter = require('events').EventEmitter
-const loadScript = require('load-script2')
+const loadScript = require('load-script')
 
 const YOUTUBE_IFRAME_API_SRC = 'https://www.youtube.com/iframe_api'
 
@@ -9,7 +9,7 @@ const YOUTUBE_STATES = {
   1: 'playing',
   2: 'paused',
   3: 'buffering',
-  5: 'cued'
+  5: 'cued',
 }
 
 const YOUTUBE_ERROR = {
@@ -31,7 +31,7 @@ const YOUTUBE_ERROR = {
   UNPLAYABLE_1: 101,
 
   // This error is the same as 101. It's just a 101 error in disguise!
-  UNPLAYABLE_2: 150
+  UNPLAYABLE_2: 150,
 }
 
 const loadIframeAPICallbacks = []
@@ -66,7 +66,7 @@ class YouTubePlayer extends EventEmitter {
       modestBranding: false,
       related: true,
       timeupdateFrequency: 1000,
-      playsInline: true
+      playsInline: true,
     }, opts)
 
     this.videoId = null
@@ -273,12 +273,7 @@ class YouTubePlayer extends EventEmitter {
     // if user includes a hardcoded <script> tag in HTML for performance, another
     // one will not be added
     if (!isLoading) {
-      loadScript(YOUTUBE_IFRAME_API_SRC).catch(err => {
-        while (loadIframeAPICallbacks.length) {
-          const loadCb = loadIframeAPICallbacks.shift()
-          loadCb(err)
-        }
-      })
+      loadScript(YOUTUBE_IFRAME_API_SRC);
     }
 
     // If ready function is not present, create it
@@ -393,15 +388,15 @@ class YouTubePlayer extends EventEmitter {
 
         // (Not part of documented API) Allow html elements with higher z-index
         // to be shown on top of the YouTube player.
-        wmode: 'opaque'
+        wmode: 'opaque',
       },
       events: {
         onReady: () => this._onReady(videoId),
         onStateChange: (data) => this._onStateChange(data),
         onPlaybackQualityChange: (data) => this._onPlaybackQualityChange(data),
         onPlaybackRateChange: (data) => this._onPlaybackRateChange(data),
-        onError: (data) => this._onError(data)
-      }
+        onError: (data) => this._onError(data),
+      },
     })
   }
 
@@ -409,7 +404,7 @@ class YouTubePlayer extends EventEmitter {
    * This event fires when the player has finished loading and is ready to begin
    * receiving API calls.
    */
-  _onReady (videoId) {
+  _onReady () {
     if (this.destroyed) return
 
     this._ready = true
